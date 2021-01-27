@@ -23,6 +23,7 @@ rm("merged_data")
 perc.joe <- df$percentage20_Joe_Biden
 perc.don <- df$percentage20_Donald_Trump
 y <- perc.joe - perc.don
+df$y <- y
 
 # add democratic margin in 2016
 df$diff.2016 <- df$percentage16_Hillary_Clinton - df$percentage16_Donald_Trump
@@ -47,7 +48,8 @@ x.names <- c(
 )
 
 # select only the above regressors
-x <- dplyr::select(df, x.names)
+x  <- dplyr::select(df, x.names)
+df <- dplyr::select(df, c("y",x.names))
 
 # preprocessing
 x$pop_density <- log(x$pop_density)
@@ -68,6 +70,29 @@ df.train <- data.frame(x.train,y=y.train)
 df.test  <- data.frame(x.test, y=y.test)
 n.train  <- dim(x.train)[1]
 n.test   <- dim(x.test)[1]
+
+
+# train-test-valid split
+spec = c(train = .6, test = .2, valid = .2)
+g = sample(cut(seq(nrow(df)),nrow(df)*cumsum(c(0,spec)),labels = names(spec)))
+
+# forse non ha senso perchè uso split diversi?
+x.train <- split(x, g)$train
+x.valid <- split(x, g)$valid
+x.test  <- split(x, g)$test
+
+y.train <- split(y, g)$train
+y.valid <- split(y, g)$valid
+y.test  <- split(y, g)$test
+
+df.train <- split(df, g)$train
+df.valid <- split(df, g)$valid
+df.test  <- split(df, g)$test
+
+n.train <- dim(x.train)[1]
+n.valid <- dim(x.valid)[1]
+n.test  <- dim(x.test)[1]
+n       <- nrow(x)
 
 #### CLASSICAL LM ####-------------------------------------------------------
 
@@ -109,12 +134,12 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=df.train)
+                       data=x.train) # L'HO MODIFICATOOOOOOOOOOOOOOOOOOOOOOOO
 
 
 # diagnostic
 summary(model_gam) # R-sq.(adj) =  0.981
-plot(model_gam)
+#plot(model_gam)
 
 # performances on test set
 y.test.gam <- predict(model_gam, newdata=df.test)
@@ -147,7 +172,7 @@ train_gam=function(x, y, out=NULL){
                            s(bachelor_or_more,bs='cr') +
                            s(perc_poveri,bs='cr') +
                            s(pop_density,bs='cr'), 
-                         data=df.train)
+                         data=train_data)
 }
 
 # predict function
@@ -198,10 +223,10 @@ sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
 # median distance of y.test from the pointwise predicted value
-median(abs(y.test-PI_split[,2]))
+mean(abs(y.test-PI_split[,2])) # 0.02823462
 
 # median length of the prediction interval
-median(abs(PI_split[,1]-PI_split[,3])) # 0.11
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.1237245
 
 # plot all y.test and prediction intervals
 plot(1:length(y.test),y.test,pch=20)
@@ -241,7 +266,7 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=df.train)
+                       data=x.train)
 
 
 # diagnostic
@@ -272,7 +297,7 @@ train_gam=function(x, y, out=NULL){
                            s(bachelor_or_more,bs='cr') +
                            s(perc_poveri,bs='cr') +
                            s(pop_density,bs='cr'), 
-                         data=df.train)
+                         data=train_data)
 }
 
 # predict function
@@ -316,17 +341,17 @@ for(i in 1:n.test)
 }
 
 # percentage of y.test inside the prediction interval 
-cnt/n.test # 0.873
+cnt/n.test # 0.9028007
 
 # indexes of y.test outside the prediction interval
 sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
-# median distance of y.test from the pointwise predicted value
-median(abs(y.test-PI_split[,2]))
+# mean distance of y.test from the pointwise predicted value
+mean(abs(y.test-PI_split[,2])) # 0.1239136
 
 # median length of the prediction interval
-median(abs(PI_split[,1]-PI_split[,3])) # 0.5, altissima!!
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.5
 
 # plot y.test outside prediction intervals
 n.sbagliati <- length(sbagliati)
@@ -354,12 +379,12 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=df.train)
+                       data=x.train)
 
 
 # diagnostic
 summary(model_gam) # R-sq.(adj) =  0.8
-plot(model_gam) # shows effective dof on the axis
+#plot(model_gam) # shows effective dof on the axis
 
 # performances on test set
 y.test.gam <- predict(model_gam, newdata=df.test)
@@ -385,7 +410,7 @@ train_gam=function(x, y, out=NULL){
                            s(bachelor_or_more,bs='cr') +
                            s(perc_poveri,bs='cr') +
                            s(pop_density,bs='cr'), 
-                         data=df.train)
+                         data=train_data)
 }
 
 # predict function
@@ -429,17 +454,17 @@ for(i in 1:n.test)
 }
 
 # percentage of y.test inside the prediction interval 
-cnt/n.test # 0.8978
+cnt/n.test # 0.8995058
 
 # indexes of y.test outside the prediction interval
 sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
-# median distance of y.test from the pointwise predicted value
-median(abs(y.test-PI_split[,2]))
+# mean distance of y.test from the pointwise predicted value
+mean(abs(y.test-PI_split[,2])) # 0.110298
 
-# median length of the prediction interval
-median(abs(PI_split[,1]-PI_split[,3])) # 0.4, ancora alta!!
+# mean length of the prediction interval
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.45
 
 # plot y.test outside prediction intervals
 n.sbagliati <- length(sbagliati)
@@ -467,18 +492,18 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=df.train)
+                       data=x.train)
 
 
 # diagnostic
 summary(model_gam) # R-sq.(adj) =  0.98
-plot(model_gam) # shows effective dof on the axis
+#plot(model_gam) # shows effective dof on the axis
 
 # performances on test set
 y.test.gam <- predict(model_gam, newdata=df.test)
 
 # MSE
-mse(y.test.gam, y.test) # 0.019
+mse(y.test.gam, y.test) # 0.001786636
 
 # train function
 train_gam=function(x, y, out=NULL){
@@ -499,7 +524,7 @@ train_gam=function(x, y, out=NULL){
                            s(bachelor_or_more,bs='cr') +
                            s(perc_poveri,bs='cr') +
                            s(pop_density,bs='cr'), 
-                         data=df.train)
+                         data=train_data)
 }
 
 # predict function
@@ -543,17 +568,17 @@ for(i in 1:n.test)
 }
 
 # percentage of y.test inside the prediction interval 
-cnt/n.test # 0.8978
+cnt/n.test # 0.9159802
 
 # indexes of y.test outside the prediction interval
 sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
 # median distance of y.test from the pointwise predicted value
-median(abs(y.test-PI_split[,2]))
+mean(abs(y.test-PI_split[,2])) #0.02749673
 
 # median length of the prediction interval
-median(abs(PI_split[,1]-PI_split[,3])) # 0.4, ancora alta!!
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.1197407
 
 # plot y.test outside prediction intervals
 n.sbagliati <- length(sbagliati)
@@ -562,25 +587,87 @@ segments(1:n.sbagliati,PI_split[sbagliati,1], 1:n.sbagliati,PI_split[sbagliati,3
 points(1:n.sbagliati,PI_split[sbagliati,1],cex=0.4,pch=10,col='blue')
 points(1:n.sbagliati,PI_split[sbagliati,3],cex=0.4,pch=10,col='blue')
 
-
-
-
+# MSE on confromal predictions
+mse(PI_split[2], y.test) # 0.150704
 
 
 #### LM w/ only 2016 data ####-----------------------------------------------------
 
-# ocio a includere 2016: pure un modello lineare fa bene!!
-plot(y ~ df$diff.2016, ylim=c(-1,1))
-abline(lm(y ~ df$diff.2016), col="red", lwd=3) # noi siamo interessati proprio a quelle che deviano da sto grafico
+# model
+lm_2016 <- lm(y ~ diff.2016, data=df.train)
 
-lm_2016 <- lm(y ~ df$diff.2016)
-summary(lm_2016) # R-sq.(adj) =  0.961
+# diagnostic
+#plot(lm_2016)
+summary(lm_2016) # R-sq.(adj) =  0.9598
 
-res <- lm_2016$residuals
-q <- quantile(res, probs=c(0.025,0.975))
-q
-suspect <- which(res>q[2] | res<q[1])
-points(df$diff.2016[suspect], y[suspect], col="green", pch=19)
+# performances on test set
+y.test.lm <- predict(lm_2016, newdata=df.test)
+
+# MSE
+mse(y.test.lm, y.test) # 0.003564515
+
+# functions
+lm_train   = lm.funs(intercept = T)$train.fun
+lm_predict = lm.funs(intercept = T)$predict.fun
+
+# alpha
+alpha <- 0.1
+
+### SPLIT CONFORMAL
+c_preds_split=conformal.pred.split(x$diff.2016,
+                                   y,
+                                   as.matrix(x.test$diff.2016),
+                                   alpha=alpha,
+                                   verbose=T,
+                                   train.fun = lm_train,
+                                   predict.fun = lm_predict,
+                                   seed = 1,
+                                   split=NULL # indices that define the data-split to be used,
+                                   # Default is NULL, in which case the index is chosen randomly
+                                   # default split size is 50%
+                                   # split=sample(1:n, size=m)
+)
+
+# interval
+PI_split <- cbind(c_preds_split$lo, c_preds_split$pred, c_preds_split$up)
+names(PI_split) <- c("lower","center","upper")
+
+# cnt: number of y.test inside the prediction interval 
+cnt <- 0
+sbagliati <- list()
+for(i in 1:n.test)
+{
+  if(y.test[i] > PI_split[i,1] & y.test[i]<PI_split[i,3])
+    cnt=cnt+1
+  else
+    sbagliati <- c(sbagliati,i)
+}
+
+# percentage of y.test inside the prediction interval 
+cnt/n.test # 0.9011532
+
+# indexes of y.test outside the prediction interval
+sbagliati <- unlist(sbagliati)
+length(sbagliati)
+
+# mean distance of y.test from the pointwise predicted value
+mean(abs(y.test-PI_split[,2])) # 0.03891312
+
+# mean length of the prediction interval
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.1610294
+
+# plot y.test outside prediction intervals
+n.sbagliati <- length(sbagliati)
+plot(1:length(y.test[sbagliati]),y.test[sbagliati],pch=20)
+segments(1:n.sbagliati,PI_split[sbagliati,1], 1:n.sbagliati,PI_split[sbagliati,3],col='blue')
+points(1:n.sbagliati,PI_split[sbagliati,1],cex=0.4,pch=10,col='blue')
+points(1:n.sbagliati,PI_split[sbagliati,3],cex=0.4,pch=10,col='blue')
+
+# MSE on confromal predictions
+mse(PI_split[2], y.test) # 0.1343345
+
+
+
 
 #### GAM w/ only 2016 data ####--------------------------------------------------
 
