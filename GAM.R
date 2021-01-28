@@ -73,26 +73,26 @@ n.test   <- dim(x.test)[1]
 
 
 # train-test-valid split
-spec = c(train = .6, test = .2, valid = .2)
-g = sample(cut(seq(nrow(df)),nrow(df)*cumsum(c(0,spec)),labels = names(spec)))
-
-# forse non ha senso perchè uso split diversi?
-x.train <- split(x, g)$train
-x.valid <- split(x, g)$valid
-x.test  <- split(x, g)$test
-
-y.train <- split(y, g)$train
-y.valid <- split(y, g)$valid
-y.test  <- split(y, g)$test
-
-df.train <- split(df, g)$train
-df.valid <- split(df, g)$valid
-df.test  <- split(df, g)$test
-
-n.train <- dim(x.train)[1]
-n.valid <- dim(x.valid)[1]
-n.test  <- dim(x.test)[1]
-n       <- nrow(x)
+#spec = c(train = .6, test = .2, valid = .2)
+#g = sample(cut(seq(nrow(df)),nrow(df)*cumsum(c(0,spec)),labels = names(spec)))
+#
+## forse non ha senso perchè uso split diversi?
+#x.train <- split(x, g)$train
+#x.valid <- split(x, g)$valid
+#x.test  <- split(x, g)$test
+#
+#y.train <- split(y, g)$train
+#y.valid <- split(y, g)$valid
+#y.test  <- split(y, g)$test
+#
+#df.train <- split(df, g)$train
+#df.valid <- split(df, g)$valid
+#df.test  <- split(df, g)$test
+#
+#n.train <- dim(x.train)[1]
+#n.valid <- dim(x.valid)[1]
+#n.test  <- dim(x.test)[1]
+#n       <- nrow(x)
 
 #### CLASSICAL LM ####-------------------------------------------------------
 
@@ -266,7 +266,7 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=x.train)
+                       data=df.train)
 
 
 # diagnostic
@@ -379,7 +379,7 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=x.train)
+                       data=df.train)
 
 
 # diagnostic
@@ -589,6 +589,9 @@ points(1:n.sbagliati,PI_split[sbagliati,3],cex=0.4,pch=10,col='blue')
 
 # MSE on confromal predictions
 mse(PI_split[2], y.test) # 0.150704
+
+
+
 
 
 #### LM w/ only 2016 data ####-----------------------------------------------------
