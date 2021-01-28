@@ -3,9 +3,15 @@ remove(list = ls())
 
 
 library(splines)
+library(pbmcapply)
+library(mgcv)
+library(conformalInference)
+
 
 setwd("C:/Users/edoar/Desktop/Nonparametric statistics/Project")
-
+source("code/Independence test function.R")
+source('code/Reverse percentile intervals function.R')
+source('code/Permutational regression function.R')
 
 #### DATA ----
 load("data/data_last_version3/data_pools.Rdata")
@@ -519,7 +525,7 @@ for(i in 0:dim(as.matrix(x))[2]){
                                                                            y = y_train, 
                                                                            coeff=i,
                                                                            perm = 500)
-} # we do not refuse for beta_2
+} # we do not reject beta_2 = 0
 
 pvalues <- c()
 
@@ -625,7 +631,7 @@ for(i in 1:length(y_test))
     missclassified <- c(missclassified,i)
 }
 
-### no obs missclassified, but intervals enormous 
+### no obs missclassified, but intervals enormous in length 
 
 
 
