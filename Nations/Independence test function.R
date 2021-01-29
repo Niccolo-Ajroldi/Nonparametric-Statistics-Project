@@ -5,9 +5,9 @@
 #' Székely, G J., Rizzo, M. L. and Bakirov, N. K. (2007). 
 #' Measuring and testing dependence by correlation of distances. The annals of Statistics 35 6 2769-2794.
 #' 
-#' The test is based on dCorr index that is a generalization of the linear correlation coefficients.
+#' The test is based on dCorr index that is a generalization of the linear correlation coefficient.
 #' dCorr takes still values among [0,1], but unlike the linear correlation coefficient, 
-#' dCorr is defined for two datasets X and Y in arbitrary dimensions, with the same number of observations.
+#' dCorr is defined for two datasets X and Y in arbitrary dimentions, with the same number of observations.
 #' This index is able to spot nonlinear and nonmonotonic depences among data and 
 #' moreover dCorr==0 characterizes independence of X and Y.
 #' 
