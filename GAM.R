@@ -31,6 +31,8 @@ df$bachelor_or_more <- df$Percent.of.adults.with.a.bachelor.s.degree.or.higher..
 
 # regressor names
 x.names <- c(
+  "lat",
+  "long",
   "diff.2016", # ?
   "polls2020",
   "total_votes20", # ?
@@ -76,7 +78,7 @@ n.test   <- dim(x.test)[1]
 #spec = c(train = .6, test = .2, valid = .2)
 #g = sample(cut(seq(nrow(df)),nrow(df)*cumsum(c(0,spec)),labels = names(spec)))
 #
-## forse non ha senso perchè uso split diversi?
+#
 #x.train <- split(x, g)$train
 #x.valid <- split(x, g)$valid
 #x.test  <- split(x, g)$test
@@ -378,13 +380,14 @@ model_gam <- mgcv::gam(y ~
                          s(RUCC_code,bs='cr',k=length(unique(df$RUCC_code))) +
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
-                         s(pop_density,bs='cr'), 
+                         s(pop_density,bs='cr') +
+                         s(lat,long,bs='tp'),
                        data=df.train)
 
 
 # diagnostic
 summary(model_gam) # R-sq.(adj) =  0.8
-#plot(model_gam) # shows effective dof on the axis
+plot(model_gam) # shows effective dof on the axis
 
 # performances on test set
 y.test.gam <- predict(model_gam, newdata=df.test)

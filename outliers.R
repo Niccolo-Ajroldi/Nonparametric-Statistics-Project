@@ -1,13 +1,12 @@
 
 library(dplyr)
-library(ModelMetrics)
 
 setwd("D:/Poli/Corsi/NPS/ProjNPS")
 
 rm(list=ls())
 cat("\014")
 
-#### data ####--------------------------------------------------------
+#### data ####------------------------------------------------------------
 
 load("data/data_pools.Rdata")
 
@@ -15,6 +14,8 @@ df <- merged_data
 names(df)
 
 rm("merged_data")
+
+#### cleaning ####--------------------------------------------------------
 
 # target variable
 perc.joe <- df$percentage20_Joe_Biden
@@ -25,31 +26,30 @@ df$y <- y
 # add democratic margin in 2016
 df$diff.2016 <- df$percentage16_Hillary_Clinton - df$percentage16_Donald_Trump
 df$bachelor_or_more <- df$Percent.of.adults.with.a.bachelor.s.degree.or.higher..2014.18
+df$pop_density <- log(df$pop_density)
 
-# regressor names
+# covariates
 x.names <- c(
-  "diff.2016", # ?
-  "polls2020",
-  "total_votes20", # ?
-  "Men",
-  "Hispanic",                                                             
-  "White",
-  "Black",
-  "Native",
-  "Asian",
-  "Income",
-  "RUCC_code",
-  "bachelor_or_more",
-  "perc_poveri",
-  "pop_density"
+  'diff.2016',
+  'polls2020',
+  'total_votes20',
+  'IncomePerCap',
+  'Women',
+  'White',
+  'Black',
+  'Hispanic',
+  'Native',
+  'Asian',
+  'bachelor_or_more',
+  'pop_density',
+  'Construction',
+  'perc_poveri',
+  'RUCC_code'
 )
 
 # select only the above regressors
 x  <- dplyr::select(df, all_of(x.names))
 df <- dplyr::select(df, c("y",x.names))
-
-# preprocessing
-x$pop_density <- log(x$pop_density)
 
 # rows indexes
 rows.joe <- which(df$y >= 0)
@@ -57,7 +57,7 @@ rows.don <- which(df$y <  0)
 
 #### PCA ####--------------------------------------------------------
 
-# sclae data
+# scale data for PCA
 x.scaled <- scale(x)
 
 # perform pca

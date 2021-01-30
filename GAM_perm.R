@@ -32,10 +32,7 @@ x.names <- c('diff20',
              'White',
              'Black',
              'Hispanic',
-             #'Native',
-             #'Asian',
              'bachelor_or_more',
-             #'estimated_median_household_income',
              'pop_density',
              'Construction',
              'perc_poveri',
@@ -74,10 +71,7 @@ formula.regressors <- c(
   "s(White,bs='cr')",
   "s(Hispanic,bs='cr')",
   "s(Black,bs='cr')",
-  #"s(Native,bs='cr')",
-  #"s(Asian,bs='cr')",
   "s(bachelor_or_more,bs='cr')",
-  #"s(estimated_median_household_income,bs='cr')",
   "s(pop_density,bs='cr')",
   "s(Construction,bs='cr')",
   "s(perc_poveri,bs='cr')",
@@ -176,10 +170,8 @@ ss$s.table
 pv_GAM <- ss$s.table[,4]
 pv_GAM_adj <- p.adjust(pv_GAM, method="BH")
 
+pv_table <- data.frame(pv_GAM, pv_GAM_adj, p_val, p_val_adj)
+View(pv_table)
 
-View(cbind((pv_GAM), pv_GAM_adj, p_val, p_val_adj))
-
-
-
-
+T0
 
