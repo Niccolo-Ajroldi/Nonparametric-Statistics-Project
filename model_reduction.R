@@ -478,6 +478,18 @@ for(j in 1:18){
 # stop parallel clusters
 stopCluster(cl)
 
+save.image("GAM_perm_results.RData")
+
+p_val
+
+load("GAM_perm_results.RData")
+ss <- summary(fit_full)
+ss$s.table
+pv_GAM = ss$s.table[,4]
+
+p_val_adj = p.adjust(p_val, method="BH")
+
+View(cbind((pv_GAM), p_val, p_val_adj))
 
 
 

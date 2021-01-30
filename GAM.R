@@ -134,7 +134,7 @@ model_gam <- mgcv::gam(y ~
                          s(bachelor_or_more,bs='cr') +
                          s(perc_poveri,bs='cr') +
                          s(pop_density,bs='cr'), 
-                       data=x.train) # L'HO MODIFICATOOOOOOOOOOOOOOOOOOOOOOOO
+                       data=df.train) 
 
 
 # diagnostic
