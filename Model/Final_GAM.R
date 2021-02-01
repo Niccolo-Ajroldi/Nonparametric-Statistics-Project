@@ -88,6 +88,7 @@ res = residuals(fit_full)
 hist(res)
 layout(1)
 qqnorm(res, main="Normal Q-Q Plot")
+col.3 <- "#F5A700"
 qqline(res, col=col.3, lwd=2)
 shapiro.test(res)
 
@@ -178,7 +179,6 @@ mean(abs(y.test-PI_split[,2])) # 0.11
 
 # mean length of the prediction interval
 mean(abs(PI_split[,1]-PI_split[,3])) # 0.47
-median(abs(PI_split[,1]-PI_split[,3])) # 0.47
 
 
 # plot y.test outside prediction intervals

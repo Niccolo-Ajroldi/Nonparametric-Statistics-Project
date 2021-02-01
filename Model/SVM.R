@@ -66,7 +66,7 @@ svm
 y.pred.valid <- predict(svm, x.valid)
 
 # MSE
-mse(y.pred.valid, y.valid) # 0.01943454
+mse(y.pred.valid, y.valid) # 0.02068711
 
 ###_____________________________________________________________________
 ### CONFORMAL PREDICTION
@@ -126,9 +126,9 @@ sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
 # mean distance of y.valid from the pointwise predicted value
-mean(abs(y.valid-PI_split[,2])) # 0.106335
+mean(abs(y.valid-PI_split[,2])) # 0.1130698
 
 # mean length of the prediction interval
-mean(abs(PI_split[,1]-PI_split[,3])) # 0.4682593
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.4852422
 
 

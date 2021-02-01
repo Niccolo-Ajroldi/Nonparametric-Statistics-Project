@@ -98,7 +98,7 @@ rf <- rf.final
 y.pred.valid <- predict(rf, x.valid)
 
 # MSE
-mse(y.pred.valid, y.valid) # 0.01508461
+mse(y.pred.valid, y.valid) # 0.01989009
 
 ###_____________________________________________________________________
 ### CONFORMAL PREDICTION
@@ -161,6 +161,6 @@ length(sbagliati)
 mean(abs(y.valid-PI_split[,2])) # 0.02823462
 
 # mean length of the prediction interval
-mean(abs(PI_split[,1]-PI_split[,3])) # 0.4279337
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.4905825
 
 
