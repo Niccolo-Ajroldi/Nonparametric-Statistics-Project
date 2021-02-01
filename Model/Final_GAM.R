@@ -4,29 +4,21 @@ library(caret)
 library(mgcv)
 library(ModelMetrics)
 library(conformalInference)
+library(randomForest)
 
 setwd("D:/Poli/Corsi/NPS/ProjNPS")
 
 rm(list=ls())
 cat("\014")
 
-#### data ####--------------------------------------------------------
+### data -------------------------------------------------------------------------
 
-load("data/data_pools.Rdata")
-
-df <- merged_data
-names(df)
-
-rm("merged_data")
-
-# target variable
-perc.joe <- df$percentage20_Joe_Biden
-perc.don <- df$percentage20_Donald_Trump
-y <- perc.joe - perc.don
-df$y <- y
+load("data/data_split.Rdata")
 
 # add democratic margin in 2016
 df$diff.2016 <- df$percentage16_Hillary_Clinton - df$percentage16_Donald_Trump
+
+# preprocessing
 df$bachelor_or_more <- df$Percent.of.adults.with.a.bachelor.s.degree.or.higher..2014.18
 df$pop_density <- log(df$pop_density)
 
@@ -44,25 +36,23 @@ x.names <- c(
 )
 
 # select only the above regressors
-x  <- dplyr::select(df, x.names)
-df <- dplyr::select(df, c("y",x.names))
+df <- dplyr::select(df, all_of(c("y",x.names)))
 
-# training samples
-library(caret)
-set.seed(1)
-training.samples <- createDataPartition(y, p=0.75, list=FALSE)
-length(training.samples)
-length(y)-length(training.samples)
+# split dataframe
+df.train <- df[index.train,]
+df.valid <- df[index.valid,]
+df.test  <- df[index.test,]
 
-# train-test split
-x.train  <- x[training.samples,]
-x.test   <- x[-training.samples,]
-y.train  <- y[training.samples]
-y.test   <- y[-training.samples]
-df.train <- data.frame(x.train,y=y.train)
-df.test  <- data.frame(x.test, y=y.test)
-n.train  <- dim(x.train)[1]
-n.test   <- dim(x.test)[1]
+# split covariates
+x.train <- dplyr::select(df.train, all_of(x.names))
+x.valid <- dplyr::select(df.valid, all_of(x.names))
+x.test  <- dplyr::select(df.test,  all_of(x.names))
+
+# split target variable
+y.train <- df.train$y
+y.valid <- df.valid$y
+y.test  <- df.test$y
+
 
 #### FINAL MODEL -------------------------------------------------------------------------
 
@@ -90,8 +80,37 @@ p
 fit_full <- mgcv::gam(formula.final, data=df.train)
 
 # diagnostic
-summary(fit_full) # R-sq.(adj) =  0.79
+summary(fit_full) # R-sq.(adj) =  0.814
 plot(fit_full) # shows effective dof on the axis
+
+# residuals
+res = residuals(fit_full)
+hist(res)
+layout(1)
+qqnorm(res, main="Normal Q-Q Plot")
+qqline(res, col=col.3, lwd=2)
+shapiro.test(res)
+
+# save plot
+col.3 <- "#F5A700"
+png(file = "Pics/GAM_residual.png", width = 6000, height = 5000, units = "px", res = 800)
+par(mfrow=c(1,2))
+hist(res,
+     col=col.3,
+     border="black",
+     prob = TRUE,
+     xlab = "Residuals",
+     ylim = c(0,3.5),
+     main = "GAM residuals")
+lines(density(res), # density plot
+      lwd = 2, # thickness of line
+      col = "orange3")
+q <- qqnorm(res, main="Normal Q-Q Plot")
+text(min(q$x, na.rm = TRUE), max(q$y, na.rm = TRUE)-0.05,
+     pos = 4, "Shapiro-Wilk test \np-value <.001", col = 1, font = 3)
+qqline(res, col=col.3, lwd=2)
+dev.off()
+
 
 # performances on test set
 y.test.gam <- predict(fit_full, newdata=x.test)
@@ -159,6 +178,8 @@ mean(abs(y.test-PI_split[,2])) # 0.11
 
 # mean length of the prediction interval
 mean(abs(PI_split[,1]-PI_split[,3])) # 0.47
+median(abs(PI_split[,1]-PI_split[,3])) # 0.47
+
 
 # plot y.test outside prediction intervals
 n.sbagliati <- length(sbagliati)

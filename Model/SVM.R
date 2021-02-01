@@ -4,7 +4,7 @@ library(caret)
 library(mgcv)
 library(ModelMetrics)
 library(conformalInference)
-library(randomForest)
+library(kernlab)
 
 setwd("D:/Poli/Corsi/NPS/ProjNPS")
 
@@ -55,50 +55,18 @@ y.valid <- df.valid$y
 y.test  <- df.test$y
 
 ###_____________________________________________________________________
-### RANDOM FOREST ####
+### SVM ####
 
-set.seed(1996)
-rf <- randomForest(y ~ ., data=df.train)
-
-rf # confusion matrix is based on OOB data
-plot(rf)  # black: OOB error rate
-
-###_____________________________________________________________________
-### TUNING mtry (ie number of variables tried at each split) with caret
-
-control <- trainControl(method="repeatedcv", number=10, repeats=1, search="grid")
-set.seed(1996)
-tunegrid <- expand.grid(.mtry=c(2:6))
-rf_gridsearch <- train(
-  y~., 
-  data=df.train, 
-  method="rf", 
-  tuneGrid=tunegrid, 
-  metric="oob",
-  trControl=control
-)
-
-#save.image(file = "RandomForest.RData")
-print(rf_gridsearch)
-ggplot(rf_gridsearch)
-
-# best performance (accuracy, kappa, ...)
-rf_gridsearch$results[which(rf_gridsearch$results[,1]==rf_gridsearch$bestTune$mtry),]
-
-# final model evaluation via OOB estimate of error rate
-rf.final <- rf_gridsearch$finalModel
-rf.final
-plot(rf_gridsearch$finalModel)
+svm = ksvm(y ~ ., data = df.train, type="nu-svr")
+svm
 
 ###_____________________________________________________________________
 ### PREDICTION ON VALIDATION SET
 
-rf <- rf.final
-
-y.pred.valid <- predict(rf, x.valid)
+y.pred.valid <- predict(svm, x.valid)
 
 # MSE
-mse(y.pred.valid, y.valid) # 0.01508461
+mse(y.pred.valid, y.valid) # 0.01943454
 
 ###_____________________________________________________________________
 ### CONFORMAL PREDICTION
@@ -107,7 +75,7 @@ mse(y.pred.valid, y.valid) # 0.01508461
 train_rf = function(x, y, out=NULL){
   colnames(x) <- x.names
   train_data <- data.frame(y,x)
-  randomForest(y ~ ., data=train_data)
+  ksvm(y ~ ., data = train_data, type="nu-svr")
 }
 
 # predict function
@@ -158,9 +126,9 @@ sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
 # mean distance of y.valid from the pointwise predicted value
-mean(abs(y.valid-PI_split[,2])) # 0.02823462
+mean(abs(y.valid-PI_split[,2])) # 0.106335
 
 # mean length of the prediction interval
-mean(abs(PI_split[,1]-PI_split[,3])) # 0.4279337
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.4682593
 
 

@@ -49,7 +49,7 @@ x.names <- c(
 
 # select only the above regressors
 x  <- dplyr::select(df, all_of(x.names))
-df <- dplyr::select(df, c("y",x.names))
+df <- dplyr::select(df, all_of(c("y",x.names)))
 
 # rows indexes
 rows.joe <- which(df$y >= 0)
@@ -73,21 +73,50 @@ class <- ifelse(df$y>=0, "blue", "red")
 plot(scores[,1], col=class)
 
 # 2 pc
-plot(scores[,1:2])
+png(file = "Pics/PCA.png", width = 6000, height = 5000, units = "px", res = 800)
+layout(1)
+plot(scores[,1:2], 
+     xlab="1st PC", 
+     ylab="2nd PC", 
+     main="PCA scores", 
+     xlim=c(-4,16))
 abline(h=0, v=0, lty=2, col='grey')
-points(scores[rows.don,1], scores[rows.don,2], col="red")
-points(scores[rows.joe,1], scores[rows.joe,2], col="blue", pch=1)
+points(scores[rows.don,1], scores[rows.don,2], col="firebrick2",  pch=1)
+points(scores[rows.joe,1], scores[rows.joe,2], col="dodgerblue1", pch=1)
+legend("topright",
+       legend=c("Democratic counties", "Republican counties"),
+       col=c("dodgerblue1", "firebrick2"), 
+       pch=c(1,1),
+       cex=0.9)
+dev.off()
 
-arrows(0,0,5,5 ,angle = 10)
+# cumulative proportion of explained variance
+png(file = "Pics/PCA_Variance.png", width = 6000, height = 5000, units = "px", res = 800)
+cs <- cumsum(pca$sd^2)/sum(pca$sd^2)
+cs[2]
+col.3 <- "#F5A700"
+plot(cumsum(pca$sd^2)/sum(pca$sd^2), 
+     type='b', 
+     axes=F, 
+     xlab='Number of PCs', 
+     ylab='Contribution to the total variance', 
+     main="Cumulative proportion of variance",
+     ylim=c(0,1))
+abline(h=1, col=col.3)
+abline(h=cs[2], lty=2, col=col.3)
+box()
+axis(2,at=0:10/10,labels=0:10/10)
+axis(1,at=1:ncol(df),labels=1:ncol(df),las=2)
+dev.off()
 
 # loadings first pc
 load <- pca$loadings[1:ncol(x),1:ncol(x)]
+
 #View(load)
 comp.1 <- load[,1]
 comp.2 <- load[,2]
-
-comp.diag <- comp.1 + comp.2
-View(comp.diag)
+comp.1
+comp.2
 
 #### t-sne ####-------------------------------------------------------
 
@@ -101,20 +130,16 @@ plot(tsne$Y, col=class,  main="tsne, perplexity=5")
 
 #### depth ####-------------------------------------------------------
 
-# prova
-a.depth <- c(23,1,4)
-ordine <- rank(a.depth, ties="first")
-ordine # high depth -> high rank -> high ordine -> more white
-colfunc <- colorRampPalette(c("black", "white"))
-colors <- colfunc(3)[ordine]
-plot(rep(1,3),col=colors,pch=19,cex=3)
+# exlporatory analysis:
+# color previous plots by depth scores
 
+# depths
 library(DepthProc)
 my.method <- "Tukey"
 x.depths <- depth(x,method=my.method)
 hist(x.depths)
 
-#
+# rank observations by depth
 colfunc <- colorRampPalette(c("grey35", "yellow"))
 ordine <- rank(x.depths, ties="first")
 colors <- colfunc(nrow(x))[ordine] # high depth -> high rank -> high order -> more yellow
@@ -124,14 +149,7 @@ plot(scores[,1:2])
 abline(h=0, v=0, lty=2, col='grey')
 points(scores[,1], scores[,2], col=colors, pch=1)
 
-
-# 2 pc
-colors <- ifelse(x.depths<0.001, "blue", "grey")
-plot(scores[,1:2])
-abline(h=0, v=0, lty=2, col='grey')
-points(scores[,1], scores[,2], col=colors, pch=1)
-
-#
+# tsne
 colfunc <- colorRampPalette(c("grey35", "yellow"))
 ordine <- rank(x.depths, ties="first")
 colors <- colfunc(nrow(x))[ordine] # high depth -> high rank -> high order -> more yellow
