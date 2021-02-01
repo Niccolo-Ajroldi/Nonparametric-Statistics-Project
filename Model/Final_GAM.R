@@ -4,7 +4,6 @@ library(caret)
 library(mgcv)
 library(ModelMetrics)
 library(conformalInference)
-library(randomForest)
 
 setwd("D:/Poli/Corsi/NPS/ProjNPS")
 
@@ -17,6 +16,7 @@ load("data/data_split.Rdata")
 
 # add democratic margin in 2016
 df$diff.2016 <- df$percentage16_Hillary_Clinton - df$percentage16_Donald_Trump
+df$diff.2016 <- cut(df$diff.2016, breaks=4)
 
 # preprocessing
 df$bachelor_or_more <- df$Percent.of.adults.with.a.bachelor.s.degree.or.higher..2014.18
@@ -81,7 +81,7 @@ fit_full <- mgcv::gam(formula.final, data=df.train)
 
 # diagnostic
 summary(fit_full) # R-sq.(adj) =  0.814
-plot(fit_full) # shows effective dof on the axis
+#plot(fit_full) # shows effective dof on the axis
 
 # residuals
 res = residuals(fit_full)

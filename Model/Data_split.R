@@ -25,6 +25,12 @@ df$y <- y
 
 #### Fraudolent counties ####--------------------------------------------------------
 
+length(which(df$state %in% c_frodate))
+length(inds.fraud$test) + length(inds.fraud$valid) + length(inds.fraud$train)
+
+length(inds.fraud$test)
+length(which(df.test$state %in% c_frodate))
+
 # states that were contested by Trump
 c_frodate<-c('AZ', 'GA', 'MI', 'NV', 'PA', 'WI')
 
@@ -36,6 +42,13 @@ y.fraud <- y[index.fraud]
 
 # STRATIFIED split of fraudolent counties in train, test and validation sets
 inds.fraud <- partition(y.fraud, p = c(train = 1/3, valid = 1/3, test = 1/3), seed = 1)
+
+
+
+
+
+max(sapply(inds.fraud,FUN=max))
+length(y.fraud) # FUCKKKK
 
 # responde variable in other counties
 y.other <- y[-index.fraud]
