@@ -25,7 +25,8 @@ needed_packages <- c(
   "grDevices",
   "progress",
   "pbapply",
-  "parallel"
+  "parallel",
+  "splines"
 )
 
 new_packages  <- needed_packages[!(needed_packages %in%installed.packages()[,"Package"])] 

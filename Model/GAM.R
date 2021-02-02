@@ -105,14 +105,14 @@ model_gam <- mgcv::gam(y ~
 
 
 # diagnostic
-summary(model_gam) # R-sq.(adj) =  0.981
+summary(model_gam)
 #plot(model_gam)
 
 # performances on valid set
 y.valid.gam <- predict(model_gam, newdata=df.valid)
 
 # MSE
-mse(y.valid.gam, y.valid) # 0.002652
+mse(y.valid.gam, y.valid)
 
 # residuals
 res <- model_gam$residuals
@@ -190,24 +190,37 @@ sbagliati <- unlist(sbagliati)
 length(sbagliati)
 
 # median distance of y.valid from the pointwise predicted value
-mean(abs(y.valid-PI_split[,2])) # 0.02823462
+mean(abs(y.valid-PI_split[,2]))
 
 # median length of the prediction interval
-mean(abs(PI_split[,1]-PI_split[,3])) # 0.1237245
+mean(abs(PI_split[,1]-PI_split[,3])) # 0.1277129
 
 # plot all y.valid and prediction intervals
-plot(1:length(y.valid),y.valid,pch=20)
-segments(1:n.valid,PI_split[,1], 1:n.valid,PI_split[,3],col='blue')
-points(1:n.valid,PI_split[,1],cex=0.4,pch=10,col='blue')
-points(1:n.valid,PI_split[,3],cex=0.4,pch=10,col='blue')
+col <- "#6699FF"
+png(file = "Full_GAM_PI_conformal.png", width = 6000, height = 5000, units = "px", res = 800)
+plot(1:length(y.valid),y.valid,
+     pch=20, 
+     ylim = c(-1,1),
+     main="Prediction intervals - Validation set", 
+     xlab="Counties", 
+     ylab="Democratic margin in 2020")
+segments(1:n.valid,PI_split[,1], 1:n.valid,PI_split[,3], lwd=.8, col='light blue')
+points(1:n.valid,PI_split[,1],cex=0.4,pch=10,col=col)
+points(1:n.valid,PI_split[,3],cex=0.4,pch=10,col=col)
+legend("topright",
+       legend=c("Conformal PI","True values"),
+       col=c(col, 1),
+       pch=c(NA,20),
+       lty=c(1,NA),
+       lwd=c(1,NA),
+       cex=0.75)
+dev.off()
 
 # plot y.valid outside prediction intervals
 n.sbagliati <- length(sbagliati)
-plot(1:length(y.valid[sbagliati]),y.valid[sbagliati],pch=20)
-segments(1:n.sbagliati,PI_split[sbagliati,1], 1:n.sbagliati,PI_split[sbagliati,3],col='blue')
-points(1:n.sbagliati,PI_split[sbagliati,1],cex=0.4,pch=10,col='blue')
-points(1:n.sbagliati,PI_split[sbagliati,3],cex=0.4,pch=10,col='blue')
-
+segments(1:n.sbagliati,PI_split[sbagliati,1], 1:n.sbagliati,PI_split[sbagliati,3], lwd=.8, col='light blue')
+points(1:n.sbagliati,PI_split[sbagliati,1],cex=0.4,pch=10,col=col)
+points(1:n.sbagliati,PI_split[sbagliati,3],cex=0.4,pch=10,col=col)
 
 #### GAM w/out 2016 data ####--------------------------------------------------
 
@@ -358,7 +371,7 @@ plot(model_gam) # shows effective dof on the axis
 y.valid.gam <- predict(model_gam, newdata=df.valid)
 
 # MSE
-mse(y.valid.gam, y.valid) # 0.019
+mse(y.valid.gam, y.valid)
 
 # train function
 train_gam=function(x, y, out=NULL){
@@ -440,6 +453,7 @@ plot(1:length(y.valid[sbagliati]),y.valid[sbagliati],pch=20)
 segments(1:n.sbagliati,PI_split[sbagliati,1], 1:n.sbagliati,PI_split[sbagliati,3],col='blue')
 points(1:n.sbagliati,PI_split[sbagliati,1],cex=0.4,pch=10,col='blue')
 points(1:n.sbagliati,PI_split[sbagliati,3],cex=0.4,pch=10,col='blue')
+
 
 
 #### GAM with pools and 2016 data ####---------------------------------------------------

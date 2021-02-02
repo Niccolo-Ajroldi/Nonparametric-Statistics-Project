@@ -60,7 +60,7 @@ y.test  <- df.test$y
 ### TUNING
 
 # cross-validation to tune parameters
-control <- trainControl(method="cv", number=10) # number = k folds
+control <- trainControl()#(method="cv", number=10) # number = k folds
 set.seed(2)
 net.caret <- train(
   y~.,

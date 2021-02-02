@@ -59,13 +59,11 @@ FIPS_state_county <- education[,c(1,2,3)]
 names(rural.urban.codes.2013)[4] <- "RUCC_code"
 names(rural.urban.codes.2013)[5] <- "UBI_code"
 
-
 # save
 write.csv(education.2014.2018,"data\\education_2014_2018.csv", row.names = FALSE)
 write.csv(education.1970.2018,"data\\education_1970_2018.csv", row.names = FALSE)
 write.csv(rural.urban.codes.2013,"data\\rural_urban_codes_2013.csv", row.names = FALSE)
 write.csv(FIPS_state_county,"data\\FIPS.csv", row.names = FALSE)
-
 
 #_______________________________________________________________________________________________
 #### POVERTY ####
