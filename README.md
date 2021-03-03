@@ -4,6 +4,8 @@ This is the repository for the project of *Nonparametric Statistics* course held
 
 A first part of the analysis is devoted to making some preliminary inference on different socio-economic and demographic factors at our disposal. We then focus on the fitting of a GAM prediction model using a part of our data as training set. We will compare it with respect to other possible models through a validation set, and, in the end, we will evaluate its predictive performances through the remaining observations, used as test set.
 
+For further details and for a formal mathematical explanation please refer to the [report](https://github.com/Niccolo-Ajroldi/Nonparametric-Statistics-Project/blob/master/NPS-Report-Ajroldi-Lurani-Marchionni.pdf).
+
 ## Repository structure
 The code is strucured as follows:
 - `/data`: folder containing all the data used for the analysis
