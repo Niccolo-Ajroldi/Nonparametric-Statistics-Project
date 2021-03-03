@@ -16,7 +16,7 @@ The code is strucured as follows:
     - `/Nations`: codes for the Inference part, on state level
     - `install.R`: file that provides automatic installation of required R packages
 - `/Pics`: folder containing most of the pics present in the report
-- `Ajroldi-Lurani-Marchionni.pdf`: report for the analysis
+- `NPS-Report-Ajroldi-Lurani-Marchionni.pdf`: report for the analysis
 
 ### Installation
 The file `install.R` provides automatic installation of the required packages.
